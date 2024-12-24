@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Planets</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="w-full h-screen overflow-hidden">
+    <div class="w-full h-screen absolute top-0 left-0 z-[2]">
+      <div class="text-center font-[dragon] text-4xl text-white flex justify-center items-center flex-col mt-5">
+        <div class="w-full lg:h-[4em] h-14 text-white overflow-hidden">
+          <h1 class="h-full heading text-5xl lg:text-9xl font-light tracking-tighter">Earth</h1>
+          <h1 class="h-full heading text-5xl lg:text-9xl font-light tracking-tighter">Mars</h1>
+          <h1 class="h-full heading text-5xl lg:text-9xl font-light tracking-tighter">Volcanic</h1>
+          <h1 class="h-full heading text-5xl lg:text-9xl font-light tracking-tighter">Venus</h1>
+        </div>
+        <h5 class="text-sm opacity-50 mt-0">Explore the wonders of our solar system.</h5>
+      </div>
+      <div class="flex justify-center items-center">
+        <div class="w-96 h-px bg-gradient-to-r from-transparent via-white to-transparent mt-4"></div>
+      </div>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/RGBELoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/loaders/TextureLoader.js"></script>
+  <script type="module" src="main.js"></script> 
+</body>
+
+</html>
