@@ -100,7 +100,7 @@ const rgbeLoader = new THREE.RGBELoader().load(
     }
 );
 
-const starTexture = new THREE.TextureLoader().load("./public/stars.jpg");
+const starTexture = new THREE.TextureLoader().load("./stars.jpg");
 starTexture.colorSpace = THREE.SRGBColorSpace;
 const starGeometry = new THREE.SphereGeometry(50, 64, 64);
 const starMaterial = new THREE.MeshBasicMaterial({
