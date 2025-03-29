@@ -1,111 +1,24 @@
-import "./style.css";
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import gsap from "gsap";
-import {RGBELoader} from 'three/examples/jsm/loaders/RGBELoader.js';
-
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  25, 
-  window.innerWidth / window.innerHeight, 
-  0.1,
-  1000);
-camera.position.z = 7;
-
-const canvas = document.querySelector('canvas');
-const renderer = new THREE.WebGLRenderer({canvas, antialias: true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-
-
-
-
-
-const radius = 1;
-const segments = 128;
-const textures = [
-  "./csilla/color.png", 
-  "./earth/map.jpg", 
-  "./venus/map.jpg", 
-  "./volcanic/color.png"
-];
-const spheres= new THREE.Group();
-
-
-let hdriLoader = new RGBELoader();
-hdriLoader.load(
-    "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/moonlit_golf_2k.hdr",
-    function (texture) {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
-        scene.environment = texture;
-    },  
-);
-
-const starTexture = new THREE.TextureLoader().load('./stars.jpg');
-starTexture.colorSpace = THREE.SRGBColorSpace;
-const starGeometry = new THREE.SphereGeometry(50, 64, 64);
-const starMaterial = new THREE.MeshStandardMaterial(
-  { map: starTexture,
-    opacity: 0.075,
-    side: THREE.BackSide }
-  );
-const star = new THREE.Mesh(starGeometry, starMaterial);
-scene.add(star);
-
-
-for(let i=0; i<4; i++){
-  
-  const textureloader = new THREE.TextureLoader(); 
-  const tex= textureloader.load(textures[i]);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  
-  const geometry = new THREE.SphereGeometry(radius, segments, segments);
-  const material = new THREE.MeshStandardMaterial({map: tex});
-  const sphere = new THREE.Mesh(geometry, material);
-  
-  
-  const angle = i * (Math.PI / 2);
-  sphere.position.x = 3 * Math.cos(angle);
-  sphere.position.z = 3 * Math.sin(angle);
-  spheres.add(sphere);
-}
-
-spheres.rotation.x = 0.1;
-spheres.position.x = 0;
-spheres.position.y = -0.7;
-scene.add(spheres);
-
-
-// const controls = new OrbitControls(camera, renderer.domElement);
-
-setInterval(() => {
-  gsap.to(spheres.rotation, 
-    {
-    duration: 2,
-    y:`+=${Math.PI/2}`,
-    ease: "expo.easeInOut"}
-  );
-}, 4000);
-
-
-function animate() {
-  requestAnimationFrame(animate);
-  // controls.update();
-  renderer.render(scene, camera);
-
-}
-animate();
-
-
-// Handle window resize
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+const canvas = document.getElementById("canvas");
+const renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true,
 });
 
+// Resize handling
+window.addEventListener("resize", () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+});
 
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+const camera = new THREE.PerspectiveCamera(25, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 9;
+
+// Throttle scroll handling
 let lastScrollTime = 0;
-const throttleDelay = 4000;
+const throttleDelay = 2000;
 let scrollCount = 0;
 
 const throttleScrollHandler = (direction) => {
@@ -164,3 +77,66 @@ window.addEventListener("wheel", wheelHandler);
 window.addEventListener("touchstart", touchStartHandler);
 window.addEventListener("touchmove", touchMoveHandler);
 window.addEventListener("touchend", touchEndHandler);
+
+// Three.js scene setup
+const scene = new THREE.Scene();
+const spheres = new THREE.Group();
+
+const radius = 1.3;
+const segments = 64;
+const orbitRadius = 4.5;
+const textures = [
+  "./csilla/color.png", 
+  "./earth/map.jpg", 
+  "./venus/map.jpg", 
+  "./volcanic/color.png"
+];
+
+const rgbeLoader = new THREE.RGBELoader().load(
+    "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/2k/moonlit_golf_1k.hdr",
+    function (texture) {
+        texture.mapping = THREE.EquirectangularRefractionMapping;
+        scene.environment = texture;
+    }
+);
+
+const starTexture = new THREE.TextureLoader().load("./public/stars.jpg");
+starTexture.colorSpace = THREE.SRGBColorSpace;
+const starGeometry = new THREE.SphereGeometry(50, 64, 64);
+const starMaterial = new THREE.MeshBasicMaterial({
+    map: starTexture,
+    transparent: true,
+    opacity: 0.4,
+    side: THREE.BackSide,
+});
+
+const starSphere = new THREE.Mesh(starGeometry, starMaterial);
+scene.add(starSphere);
+
+for (let i = 0; i < 4; i++) {
+    const textureLoader = new THREE.TextureLoader();
+    const texture = textureLoader.load(textures[i]);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    const sphereGeometry = new THREE.SphereGeometry(radius, segments, segments);
+    const sphereMaterial = new THREE.MeshBasicMaterial({ map: texture });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    const angle = (i / 4) * (Math.PI * 2);
+    sphere.position.x = orbitRadius * Math.cos(angle);
+    sphere.position.z = orbitRadius * Math.sin(angle);
+    spheres.add(sphere);
+}
+
+spheres.rotation.x = 0.1;
+spheres.position.y = -0.8;
+scene.add(spheres);
+
+const clock = new THREE.Clock();
+function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+    spheres.children.forEach(
+        (element) => (element.rotation.y = clock.getElapsedTime() * 0.01)
+    );
+}
+
+animate();
